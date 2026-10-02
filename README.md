@@ -339,6 +339,29 @@ The five volumes are a small pipeline-debugging subset, not a sufficient basis f
 11. Integrate authentication, role-based permissions, and MySQL storage.
 12. Perform testing, documentation, and deployment preparation.
 
+## Project Completion Status
+
+**Estimated overall project completion: 11%**
+
+This is a provisional planning estimate based on the work verified so far and an approximately equal workload split across four members. It is not a measured model-performance score. Percentages should be updated as deliverables are completed and reviewed.
+
+### Completion by Team Member
+
+| Team Member | Assigned Work | Verified Progress | Estimated Completion |
+|---|---|---|---:|
+| Member 1 | Dataset collection and MRI preprocessing | ADNI data organized; DICOM-to-NIfTI conversion and initial QC completed for five volumes. Full preprocessing and expanded dataset validation remain. | 35% |
+| Member 2 | Ground-truth mask preparation and U-Net development | No completed mask-pairing or model-training deliverable has been verified yet. | 0% |
+| Member 3 | Segmentation evaluation and hippocampal analysis | Evaluation metrics, volume analysis, and classification experiments are pending the validated masks and model predictions. | 0% |
+| Member 4 | Frontend, backend, database, and integration | Project documentation and initial repository structure are available; functional frontend, backend, database, and integration remain pending. | 10% |
+
+### Overall Calculation
+
+With four members assigned approximately equal workloads, the current planning estimate is the average of the member completion estimates:
+
+**(35% + 0% + 0% + 10%) / 4 = 11.25%, rounded to 11%.**
+
+The estimate will change as work is completed. A completed README or architecture diagram is a documentation deliverable and does not mean that the full application or model pipeline is implemented.
+
 ## Team Work Distribution
 
 The project is planned for four members with approximately equal overall responsibility. Assignments below describe the planned division, not necessarily completed work.
