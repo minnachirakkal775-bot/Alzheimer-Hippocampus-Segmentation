@@ -277,6 +277,18 @@ The percentages below are **provisional progress estimates** based on the work c
 
 **Calculation:** (35% + 0% + 0% + 10%) ÷ 4 = **11.25%**.
 
+### Project Completion Graph
+
+```text
+Member 1 — Dataset and preprocessing       35% | ███████░░░░░░░░░░░░░
+Member 2 — U-Net model development           0% | ░░░░░░░░░░░░░░░░░░░░
+Member 3 — Evaluation and backend            0% | ░░░░░░░░░░░░░░░░░░░░
+Member 4 — Android app and integration      10% | ██░░░░░░░░░░░░░░░░░░
+Overall project completion               11.25% | ██▎░░░░░░░░░░░░░░░░░
+```
+
+*Each bar represents progress out of 100%. The overall figure is the average of the four members’ estimates.*
+
 > **Note:** This is an approximate planning figure, not a verified measurement of all project tasks. Update the table as implementation milestones are completed. The five-volume conversion and QC test does not mean that the complete dataset has been preprocessed or that the U-Net model has been trained.
 
 ## Development Roadmap
