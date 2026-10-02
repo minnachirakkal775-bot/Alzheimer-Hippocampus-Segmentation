@@ -23,9 +23,59 @@ The planned application combines an MRI-processing pipeline, hippocampus segment
 
 ## Updated System Architecture
 
-The diagram below shows the proposed end-to-end system, including authentication, separate User and Admin workflows, MRI processing, U-Net segmentation, evaluation, feature extraction, visualization, reporting, and database storage.
+The following Mermaid flowchart describes the complete proposed workflow, including role-based access, MRI processing, hippocampus segmentation, evaluation, feature extraction, visualization, report generation, and database storage.
 
-![Updated System Architecture](docs/system-architecture.png)
+```mermaid
+flowchart TD
+    A["Authentication and Role-Based Access Control"] --> B["User Role"]
+    B --> C{"Select Role"}
+
+    C -->|User| D["User Dashboard"]
+    D --> E["Upload Brain MRI"]
+    E --> F["FastAPI Backend"]
+    F --> G["MRI Validation"]
+    G --> H["DICOM to NIfTI Conversion"]
+    H --> I["MRI Preprocessing"]
+    I --> J["Resampling and Normalization"]
+    J --> K["Denoising and Bias Correction"]
+    K --> L["Quality Control"]
+    L --> M["Hippocampus Segmentation"]
+    M --> N["U-Net Model"]
+    N --> O["Predicted Hippocampus Mask"]
+
+    O --> P["Segmentation Evaluation"]
+    P --> P1["Dice Score"]
+    P --> P2["IoU"]
+    P --> P3["Precision and Recall"]
+
+    O --> Q["Hippocampal Feature Extraction"]
+    Q --> Q1["Left and Right Hippocampal Volume"]
+    Q --> Q2["Volume Asymmetry"]
+    Q --> Q3["Optional Alzheimer's Stage Classification"]
+    Q3 --> Q4["Explainable AI"]
+
+    P --> R["Results and Visualization"]
+    Q1 --> R
+    Q2 --> R
+    Q3 --> R
+    Q4 --> R
+
+    R --> S["MRI Slice Viewer and Segmentation Overlay"]
+    S --> T["Generate Analysis Report"]
+    T --> U[("MySQL Database")]
+    U --> V["User History and Admin Monitoring"]
+    V --> D
+
+    C -->|Admin| W["Admin Dashboard"]
+    W --> X["Manage Users and Monitor System"]
+    X --> U
+
+    D --- Y["React Frontend"]
+    Y --- F
+
+    classDef app fill:#e5f3ff,stroke:#2878b5,color:#12436b,stroke-width:1px;
+    class A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,P1,P2,P3,Q,Q1,Q2,Q3,Q4,R,S,T,V,W,X,Y app;
+```
 
 ### Architecture Workflow
 
@@ -44,7 +94,6 @@ The diagram below shows the proposed end-to-end system, including authentication
 13. **History and monitoring:** Users can access only their own records; authorized administrators can access permitted management and monitoring functions.
 
 *The architecture represents the planned complete system. Only the components explicitly identified in the project status below should be considered implemented and verified.*
-
 ## Project Pipeline
 
 ### 1. Dataset Acquisition
