@@ -10,6 +10,7 @@ An AI-assisted research project that aims to segment the hippocampus from brain 
 - [Objectives](#objectives)
 - [System Architecture](#system-architecture)
 - [Technology Stack](#technology-stack)
+- [Programming Languages Used and Planned](#programming-languages-used-and-planned)
 - [Dataset and Current Progress](#dataset-and-current-progress)
 - [Project Structure](#project-structure)
 - [Team Responsibilities](#team-responsibilities)
@@ -43,27 +44,122 @@ The system is being developed as a research and educational project. It must not
 
 ## System Architecture
 
+### High-level system architecture
+
 ```mermaid
-flowchart TD
-    A[ADNI MRI Dataset] --> B[DICOM MRI Files]
-    B --> C[DICOM to NIfTI Conversion]
-    C --> D[MRI Preprocessing and Quality Checks]
-    D --> E[Verified Hippocampus Masks]
-    E --> F[MRI-Mask Pairing and Subject-Level Splits]
-    F --> G[U-Net Training]
-    G --> H[Hippocampus Segmentation Prediction]
-    H --> I[Evaluation: Dice, IoU, Precision, Recall]
-    H --> J[Hippocampal Volume Analysis]
-    I --> K[FastAPI Backend]
-    J --> K
-    L[Flutter Android Application] --> M[Login and MRI Upload]
-    M --> K
-    K <--> N[MySQL Database]
-    K --> O[Segmentation and Measurement Results]
-    O --> P[Mobile Result Viewer and Reports]
-    P --> Q[Signed Android App Bundle]
-    Q --> R[Google Play Console Review and Release]
+flowchart TB
+    subgraph DATA[1. Data acquisition]
+        A[ADNI dataset access] --> B[Baseline T1-weighted MRI]
+        B --> C[Original DICOM series]
+    end
+
+    subgraph PREP[2. MRI preprocessing - Python / VS Code]
+        C --> D[Inspect series and metadata]
+        D --> E[Convert DICOM to NIfTI]
+        E --> F[Validate dimensions, orientation and voxel spacing]
+        F --> G[Quality control and slice visualization]
+        G --> H[Normalization / resampling / other suitable preprocessing]
+        H --> I[Prepared MRI volumes]
+    end
+
+    subgraph LABEL[3. Ground-truth preparation]
+        M[Obtain authorized hippocampus masks] --> N[Check labels and image-mask alignment]
+        N --> O[Pair MRI volumes with masks]
+        O --> P[Subject-level train / validation / test split]
+    end
+
+    I --> O
+
+    subgraph AI[4. Deep learning - PyTorch]
+        P --> Q[Load MRI-mask pairs]
+        Q --> R[U-Net encoder, bottleneck and decoder]
+        R --> S[Train and validate model]
+        S --> T[Save checkpoint and training history]
+        T --> U[Inference: predict hippocampus mask]
+    end
+
+    subgraph EVAL[5. Evaluation and measurements - Python]
+        U --> V[Compare prediction with reference mask]
+        V --> W[Dice / IoU / precision / recall]
+        U --> X[Validate image geometry and mask]
+        X --> Y[Calculate left and right hippocampal volume]
+        Y --> Z[Generate measurements and analysis results]
+    end
+
+    subgraph SERVER[6. Backend - FastAPI]
+        API[REST API] --> AUTH[Authentication and role checks]
+        AUTH --> UP[Validate and receive MRI upload]
+        UP --> PROC[Run preprocessing and model inference]
+        PROC --> RES[Return segmentation and measurements]
+        API --> HIST[User scan history and report endpoints]
+    end
+
+    U --> PROC
+    Z --> RES
+
+    subgraph DB[7. Database - MySQL]
+        DBU[Users and roles]
+        DBS[Scan metadata]
+        DBR[Analysis results and reports]
+        DBL[Activity and model-version logs]
+    end
+    AUTH <--> DBU
+    UP <--> DBS
+    RES <--> DBR
+    HIST <--> DBS
+    HIST <--> DBR
+    API <--> DBL
+
+    subgraph MOBILE[8. Android app - Flutter / Dart / Android Studio]
+        APP[Android application]
+        LOGIN[Registration and login]
+        DASH[User dashboard]
+        FILE[Select and upload MRI]
+        VIEW[View MRI and segmentation overlay]
+        MEAS[View measurements and report]
+        HISTORY[Personal scan history]
+        ADMIN[Authorized admin screens]
+        APP --> LOGIN --> DASH
+        DASH --> FILE
+        DASH --> HISTORY
+        DASH --> ADMIN
+        RES --> VIEW
+        RES --> MEAS
+    end
+
+    FILE --> API
+    API --> VIEW
+    API --> MEAS
+    HIST --> HISTORY
+
+    subgraph RELEASE[9. Testing and distribution]
+        TEST[Integration, security and device testing]
+        AAB[Signed Android App Bundle]
+        CONSOLE[Google Play Console: testing, declarations and review]
+        USERS[Release to users after approval]
+        APP --> TEST --> AAB --> CONSOLE --> USERS
+    end
 ```
+
+### Detailed module descriptions
+
+| Module | Input | Processing | Output |
+|---|---|---|---|
+| Dataset acquisition | ADNI MRI data | Organize scans by subject and series; follow dataset access conditions | Original MRI files and metadata |
+| DICOM conversion | DICOM series | Read image series and convert to NIfTI while checking spatial metadata | NIfTI volumes |
+| Preprocessing and QC | NIfTI volumes | Validate dimensions/orientation/spacing; perform suitable normalization, resampling and quality checks | Validated MRI volumes and QC reports |
+| Mask preparation | Authorized hippocampus labels | Confirm label meaning, geometry and alignment; pair masks with MRI | Verified MRI-mask pairs |
+| Dataset splitting | Verified pairs | Split by subject to avoid leakage between partitions | Training, validation and test sets |
+| U-Net training | Training pairs | Learn image-to-mask mapping; monitor validation; save checkpoints | Trained segmentation model |
+| Inference | New, supported MRI volume | Apply the same required preprocessing and run the trained model | Predicted hippocampus mask |
+| Evaluation | Predictions and reference masks | Calculate Dice, IoU, precision and recall; inspect errors | Evaluation metrics and plots |
+| Measurement | Validated mask and voxel geometry | Calculate left/right volumes and related measurements | Quantitative results |
+| FastAPI backend | App requests and uploaded files | Authenticate, authorize, validate, invoke processing and return results | API responses and controlled access |
+| MySQL database | Account and analysis metadata | Store records with ownership and access controls | Persistent application records |
+| Android app | User input and API responses | Handle login, upload, visualization, history and reports | Mobile user experience |
+| Release pipeline | Tested app build | Sign bundle, complete Play Console declarations/testing/review | Published app if approved |
+
+> **Important:** This diagram represents the target architecture. Several modules—especially verified mask preparation, model training, backend, database, and Android app—are still planned and must not be considered implemented until tested.
 
 ## Technology Stack
 
@@ -80,6 +176,20 @@ flowchart TD
 | Mobile app | Flutter, Dart, Android Studio | Android user interface |
 | Version control | Git, GitHub | Collaboration and source management |
 | Distribution | Android App Bundle, Google Play Console | App release, subject to requirements and review |
+
+## Programming Languages Used and Planned
+
+| Language | Where it is used | Purpose | Status |
+|---|---|---|---|
+| **Python** | MRI preprocessing, U-Net model, evaluation scripts, FastAPI backend | Image processing, deep learning, data analysis, API services | Used for initial conversion and QC; further modules planned |
+| **Dart** | Flutter Android application | Mobile screens, navigation, API communication and result display | Planned for app development |
+| **SQL** | MySQL database | Create and query user, scan, analysis, report and activity records | Planned for backend/database implementation |
+| **PowerShell** | Windows development terminal | Create environments, install packages, run scripts and manage the project | Used for local development commands |
+| **Markdown** | `README.md` and project documentation | Document setup, architecture, progress and usage | In use |
+| **Mermaid** | Architecture diagram in this README | Describe the system workflow and module relationships | Used in documentation |
+| **YAML** | Potential configuration and CI files | Store structured configuration or automation workflows, if introduced | Optional / not confirmed as implemented |
+
+**Primary programming languages:** Python for AI and backend development, Dart for the Android application, and SQL for database operations. Markdown and Mermaid are used for documentation, while PowerShell supports the Windows development workflow.
 
 ## Dataset and Current Progress
 
