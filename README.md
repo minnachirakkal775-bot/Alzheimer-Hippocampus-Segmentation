@@ -6,23 +6,26 @@ An AI-assisted research project that aims to segment the hippocampus from brain 
 
 ## Table of Contents
 
-- [Project Overview](#project-overview)
-- [Objectives](#objectives)
-- [System Architecture](#system-architecture)
-- [Technology Stack](#technology-stack)
-- [Programming Languages Used and Planned](#programming-languages-used-and-planned)
-- [Dataset and Current Progress](#dataset-and-current-progress)
-- [Project Structure](#project-structure)
-- [Team Responsibilities](#team-responsibilities)
-- [Development Roadmap](#development-roadmap)
-- [Setup](#setup)
-- [Planned Application Workflow](#planned-application-workflow)
-- [Evaluation Plan](#evaluation-plan)
-- [Privacy and Security](#privacy-and-security)
-- [Limitations](#limitations)
-- [Future Enhancements](#future-enhancements)
-- [Acknowledgment](#acknowledgment)
-- [Disclaimer](#disclaimer)
+| No. | Section | Description |
+|---:|---|---|
+| 1 | [Project Overview](#project-overview) | Introduction and project status |
+| 2 | [Objectives](#objectives) | Main project goals |
+| 3 | [System Architecture](#system-architecture) | Planned system modules and connections |
+| 4 | [Technology Stack](#technology-stack) | Frameworks, tools, and technologies |
+| 5 | [Programming Languages Used and Planned](#programming-languages-used-and-planned) | Languages used or planned for development |
+| 6 | [Dataset and Current Progress](#dataset-and-current-progress) | Dataset details and completed preprocessing work |
+| 7 | [Project Structure](#project-structure) | Repository organization |
+| 8 | [Team Responsibilities](#team-responsibilities) | Work allocation among four members |
+| 9 | [Member-wise and Overall Project Completion](#member-wise-and-overall-project-completion) | Provisional progress estimates for each member and the project |
+| 10 | [Development Roadmap](#development-roadmap) | Planned implementation stages |
+| 11 | [Setup](#setup) | Environment setup instructions |
+| 12 | [Planned Application Workflow](#planned-application-workflow) | Intended app usage flow |
+| 13 | [Evaluation Plan](#evaluation-plan) | Model evaluation measures |
+| 14 | [Privacy and Security](#privacy-and-security) | Data protection considerations |
+| 15 | [Limitations](#limitations) | Current constraints |
+| 16 | [Future Enhancements](#future-enhancements) | Possible future work |
+| 17 | [Acknowledgment](#acknowledgment) | Dataset and project acknowledgments |
+| 18 | [Disclaimer](#disclaimer) | Research-use notice |
 
 ## Project Overview
 
@@ -258,6 +261,23 @@ The work is divided into four approximately equal responsibility areas. The perc
 | Member 4 | Android app, integration, and release preparation | Develop Flutter screens; implement login, upload, result display, history, and reports; connect APIs; create app icon; test on Android devices; build signed AAB; prepare store listing and testing materials. | Android app, app icon, integrated interface, tested release bundle, Play Store listing materials. |
 
 All members contribute to weekly meetings, project diaries, code reviews, integration testing, final documentation, review presentations, and the final demonstration.
+
+
+## Member-wise and Overall Project Completion
+
+The percentages below are **provisional progress estimates** based on the work completed and implementation status currently documented in this repository. They are not automatically calculated from Git commits or a formal assessment. Planning and study are acknowledged, but are not counted as completed implementation.
+
+| Member | Assigned responsibility | Estimated completion | Current status |
+|---|---|---:|---|
+| Member 1 | Dataset collection and preprocessing | 35% | ADNI data organization, DICOM-to-NIfTI conversion, and initial quality checks have been completed for five test MRI volumes. Ground-truth masks, complete preprocessing, and dataset splitting remain pending. |
+| Member 2 | U-Net model development | 0% | Model architecture and workflow have been studied/planned; implementation, training, and validation remain pending. |
+| Member 3 | Evaluation, hippocampal analysis, and backend | 0% | Evaluation metrics, measurements, API, and database have been planned; implementation remains pending. |
+| Member 4 | Android application, integration, and release | 10% | Application architecture and release planning have started; app implementation, integration, testing, and publication remain pending. |
+| **Overall project** | **All four members** | **11.25% (approximately 11%)** | **Estimated average of the four member completion percentages.** |
+
+**Calculation:** (35% + 0% + 0% + 10%) ÷ 4 = **11.25%**.
+
+> **Note:** This is an approximate planning figure, not a verified measurement of all project tasks. Update the table as implementation milestones are completed. The five-volume conversion and QC test does not mean that the complete dataset has been preprocessed or that the U-Net model has been trained.
 
 ## Development Roadmap
 
