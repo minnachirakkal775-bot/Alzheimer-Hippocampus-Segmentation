@@ -1,418 +1,289 @@
 # Alzheimer’s Disease Detection Using Hippocampus Segmentation with U-Net
 
+An AI-assisted research project that aims to segment the hippocampus from brain MRI scans using a U-Net model and provide analysis through an Android application. The planned mobile app will communicate with a Python backend and may be distributed through the Google Play Store after implementation, testing, and approval.
+
+> **Project status:** Initial dataset conversion and quality checks have been completed for five test MRI volumes. Model training, segmentation evaluation, backend implementation, Android app development, and Play Store publication are still pending. This is a research prototype, not a medical diagnostic device.
+
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Objectives](#objectives)
+- [System Architecture](#system-architecture)
+- [Technology Stack](#technology-stack)
+- [Dataset and Current Progress](#dataset-and-current-progress)
+- [Project Structure](#project-structure)
+- [Team Responsibilities](#team-responsibilities)
+- [Development Roadmap](#development-roadmap)
+- [Setup](#setup)
+- [Planned Application Workflow](#planned-application-workflow)
+- [Evaluation Plan](#evaluation-plan)
+- [Privacy and Security](#privacy-and-security)
+- [Limitations](#limitations)
+- [Future Enhancements](#future-enhancements)
+- [Acknowledgment](#acknowledgment)
+- [Disclaimer](#disclaimer)
+
 ## Project Overview
 
-This project proposes a computer-aided research system for analyzing brain Magnetic Resonance Imaging (MRI) scans, segmenting the hippocampus using a U-Net deep-learning model, and extracting hippocampal measurements that may support Alzheimer’s disease research.
+Alzheimer’s disease is associated with changes in brain structure, including the hippocampus. This project explores the use of deep learning to segment the hippocampus from T1-weighted brain MRI scans. The intended system combines MRI data conversion and preprocessing, U-Net segmentation, evaluation and measurement, a Python backend, and an Android application.
 
-The planned application combines an MRI-processing pipeline, hippocampus segmentation, quantitative analysis, optional disease-stage classification, an interactive web interface, and secure record management.
-
-**Important:** This is an academic research prototype, not a clinically validated diagnostic system. Its outputs must not be used as a substitute for professional medical assessment.
+The system is being developed as a research and educational project. It must not be used to make clinical decisions.
 
 ## Objectives
 
-- Organize and validate brain MRI data.
-- Convert DICOM studies to NIfTI volumes when required.
+- Organize and validate ADNI MRI data.
+- Convert DICOM image series to NIfTI volumes.
 - Develop a reproducible MRI preprocessing pipeline.
-- Prepare and verify hippocampus segmentation masks.
-- Train and evaluate a U-Net model for hippocampus segmentation.
-- Calculate left and right hippocampal volumes and volume asymmetry.
-- Explore optional Alzheimer’s stage classification when suitable labels and data are available.
-- Present MRI slices, segmentation overlays, and analysis reports through a web application.
-- Provide role-based access for Admin and User accounts.
-- Maintain project documentation, quality-control reports, and experiment results.
+- Obtain and verify hippocampus segmentation masks.
+- Train and evaluate a U-Net segmentation model.
+- Calculate hippocampal measurements from verified masks.
+- Develop backend APIs to connect the model and mobile app.
+- Build an Android app for MRI upload, result visualization, and scan history.
+- Prepare the app for testing and possible Google Play Store distribution.
 
-## Updated System Architecture
-
-The following Mermaid flowchart describes the complete proposed workflow, including role-based access, MRI processing, hippocampus segmentation, evaluation, feature extraction, visualization, report generation, and database storage.
+## System Architecture
 
 ```mermaid
 flowchart TD
-    A["Authentication and Role-Based Access Control"] --> B["User Role"]
-    B --> C{"Select Role"}
-
-    C -->|User| D["User Dashboard"]
-    D --> E["Upload Brain MRI"]
-    E --> F["FastAPI Backend"]
-    F --> G["MRI Validation"]
-    G --> H["DICOM to NIfTI Conversion"]
-    H --> I["MRI Preprocessing"]
-    I --> J["Resampling and Normalization"]
-    J --> K["Denoising and Bias Correction"]
-    K --> L["Quality Control"]
-    L --> M["Hippocampus Segmentation"]
-    M --> N["U-Net Model"]
-    N --> O["Predicted Hippocampus Mask"]
-
-    O --> P["Segmentation Evaluation"]
-    P --> P1["Dice Score"]
-    P --> P2["IoU"]
-    P --> P3["Precision and Recall"]
-
-    O --> Q["Hippocampal Feature Extraction"]
-    Q --> Q1["Left and Right Hippocampal Volume"]
-    Q --> Q2["Volume Asymmetry"]
-    Q --> Q3["Optional Alzheimer's Stage Classification"]
-    Q3 --> Q4["Explainable AI"]
-
-    P --> R["Results and Visualization"]
-    Q1 --> R
-    Q2 --> R
-    Q3 --> R
-    Q4 --> R
-
-    R --> S["MRI Slice Viewer and Segmentation Overlay"]
-    S --> T["Generate Analysis Report"]
-    T --> U[("MySQL Database")]
-    U --> V["User History and Admin Monitoring"]
-    V --> D
-
-    C -->|Admin| W["Admin Dashboard"]
-    W --> X["Manage Users and Monitor System"]
-    X --> U
-
-    D --- Y["React Frontend"]
-    Y --- F
-
-    classDef app fill:#e5f3ff,stroke:#2878b5,color:#12436b,stroke-width:1px;
-    class A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,P1,P2,P3,Q,Q1,Q2,Q3,Q4,R,S,T,V,W,X,Y app;
+    A[ADNI MRI Dataset] --> B[DICOM MRI Files]
+    B --> C[DICOM to NIfTI Conversion]
+    C --> D[MRI Preprocessing and Quality Checks]
+    D --> E[Verified Hippocampus Masks]
+    E --> F[MRI-Mask Pairing and Subject-Level Splits]
+    F --> G[U-Net Training]
+    G --> H[Hippocampus Segmentation Prediction]
+    H --> I[Evaluation: Dice, IoU, Precision, Recall]
+    H --> J[Hippocampal Volume Analysis]
+    I --> K[FastAPI Backend]
+    J --> K
+    L[Flutter Android Application] --> M[Login and MRI Upload]
+    M --> K
+    K <--> N[MySQL Database]
+    K --> O[Segmentation and Measurement Results]
+    O --> P[Mobile Result Viewer and Reports]
+    P --> Q[Signed Android App Bundle]
+    Q --> R[Google Play Console Review and Release]
 ```
-
-### Architecture Workflow
-
-1. **Authentication and role-based access:** The application identifies the logged-in user and applies permissions based on the assigned role.
-2. **User dashboard:** A user uploads a brain MRI and views their own scans, results, reports, and history.
-3. **Admin dashboard:** An authorized administrator manages user accounts and monitors system activity.
-4. **MRI validation:** The backend checks uploaded files and required metadata.
-5. **DICOM-to-NIfTI conversion:** DICOM series are converted to NIfTI volumes when the input is in DICOM format.
-6. **MRI preprocessing:** The planned pipeline includes resampling, normalization, denoising, bias-field correction, and quality control.
-7. **Hippocampus segmentation:** A U-Net model predicts a hippocampus mask from the processed MRI.
-8. **Segmentation evaluation:** Where verified ground-truth masks are available, predictions are evaluated using Dice score, Intersection over Union (IoU), precision, and recall.
-9. **Hippocampal feature extraction:** The system calculates left and right hippocampal volumes and volume asymmetry from suitable masks.
-10. **Optional classification and explainability:** Classification and explainable-AI methods may be explored if appropriate diagnostic labels and sufficient validated data are available.
-11. **Results and visualization:** MRI slices and segmentation overlays are displayed in the frontend.
-12. **Report generation and storage:** Analysis reports and authorized records are stored in the database.
-13. **History and monitoring:** Users can access only their own records; authorized administrators can access permitted management and monitoring functions.
-
-*The architecture represents the planned complete system. Only the components explicitly identified in the project status below should be considered implemented and verified.*
-## Project Pipeline
-
-### 1. Dataset Acquisition
-
-The project uses brain MRI data obtained from the Alzheimer’s Disease Neuroimaging Initiative (ADNI), subject to the applicable data-use terms. Dataset access, redistribution, and publication must follow ADNI requirements.
-
-### 2. DICOM-to-NIfTI Conversion
-
-The conversion pipeline uses Python imaging tools to read DICOM series, construct 3D volumes, and save NIfTI files. Conversion reports record successful and failed cases and support quality checks.
-
-### 3. MRI Preprocessing
-
-The intended preprocessing stages include:
-
-- MRI volume validation and orientation checks.
-- Resampling to a consistent voxel spacing when appropriate.
-- Intensity normalization.
-- Denoising.
-- Bias-field correction.
-- Optional skull stripping or registration when justified by the data and task.
-- Quality-control reports and visual inspection.
-
-Preprocessing choices must preserve anatomical information and maintain spatial alignment between MRI volumes and segmentation masks.
-
-### 4. Hippocampus Mask Preparation
-
-Training a supervised segmentation model requires MRI volumes paired with verified ground-truth hippocampus masks. The masks must be checked for correct subject identity, orientation, voxel spacing, dimensions, and alignment. Categorical masks should use nearest-neighbor interpolation if resampling is required.
-
-Training, validation, and test splits should be created at the subject level to prevent data leakage.
-
-### 5. U-Net Segmentation
-
-The planned baseline is a U-Net convolutional neural network. It learns to predict hippocampus labels from MRI input volumes or slices using paired training examples. Possible future experiments include Attention U-Net or 3D U-Net, depending on available data, compute resources, and project scope.
-
-### 6. Evaluation
-
-When verified ground-truth masks are available, evaluation may include Dice similarity coefficient, Intersection over Union (IoU), precision and recall, visual review of segmentation overlays, and error analysis on held-out subjects. Metrics should be calculated on data not used to train the model.
-
-### 7. Hippocampal Analysis
-
-The predicted or reference masks can support quantitative analysis, including left and right hippocampal volumes and asymmetry. Volume calculations require correct voxel-spacing information and validated masks.
-
-### 8. Optional Classification and Explainable AI
-
-Classification is a separate, optional research stage. It depends on suitable clinical or diagnostic labels, an adequate sample size, and a carefully designed subject-level evaluation. Potential methods and explainability techniques will be selected after the data and segmentation pipeline are validated.
 
 ## Technology Stack
 
-| Component | Planned / Used Technology |
-|---|---|
-| Programming language | Python |
-| MRI data | ADNI |
-| Medical-image conversion and processing | SimpleITK, NiBabel, pydicom |
-| Deep learning | PyTorch |
-| Segmentation architecture | U-Net |
-| Data analysis | NumPy, pandas, scikit-learn |
-| Visualization | Matplotlib and web-based MRI visualization |
-| Backend API | FastAPI |
-| Frontend | React |
-| Database | MySQL |
-| Development environment | VS Code, Git, GitHub |
-| Operating system used for development | Windows |
-
-The technology list describes the project stack and planned implementation; it does not imply that every component has already been integrated.
-
-## User Roles and Access Control
-
-### User
-
-- Register or sign in.
-- Upload MRI scans.
-- View their own MRI records and analysis results.
-- View segmentation overlays and measurements.
-- Access their own reports and analysis history.
-
-### Admin
-
-- Manage user accounts and roles.
-- Monitor system activity.
-- View authorized system records and reports.
-- Review audit logs and model-version information.
-
-**Security requirement:** Authentication, role checks, and record ownership must be enforced by the backend. Hiding controls in the frontend alone is not sufficient. Sensitive administrative access should be authorized and logged.
-
-## Proposed Database Design
-
-| Table | Purpose |
-|---|---|
-| `users` | User profile and authentication-related records |
-| `roles` | Role definitions and permissions |
-| `mri_scans` | MRI upload metadata and ownership |
-| `analysis_results` | Segmentation outputs, measurements, and metrics |
-| `reports` | Generated report metadata and storage references |
-| `activity_logs` | Security and system activity records |
-| `model_versions` | Model identifiers and experiment/version metadata |
-
-The final schema will be refined during backend implementation. Passwords must be stored using secure password hashing, not as plain text.
-
-## Proposed API Endpoints
-
-The following are design examples and should be treated as planned until implemented and tested.
-
-| Method | Endpoint | Purpose |
+| Component | Planned technology | Purpose |
 |---|---|---|
-| `POST` | `/api/auth/register` | Register a user |
-| `POST` | `/api/auth/login` | Authenticate a user |
-| `GET` | `/api/users/me` | Retrieve the current user profile |
-| `POST` | `/api/mri/upload` | Upload an MRI scan |
-| `GET` | `/api/mri` | List scans accessible to the current user |
-| `POST` | `/api/analysis/{scan_id}` | Start an analysis |
-| `GET` | `/api/analysis/{analysis_id}` | Retrieve analysis results |
-| `GET` | `/api/reports/{report_id}` | Retrieve an authorized report |
-| `GET` | `/api/admin/users` | Admin-only user management |
-| `GET` | `/api/admin/activity` | Admin-only activity monitoring |
+| MRI dataset | ADNI | Source of brain MRI data |
+| Image format | DICOM, NIfTI | MRI input and processing |
+| Development environment | VS Code | Python and backend development |
+| Image processing | SimpleITK, NiBabel, NumPy | Reading and processing MRI volumes |
+| Data analysis | Pandas, Matplotlib | Reports and visualizations |
+| Deep learning | PyTorch | U-Net implementation and training |
+| Backend | Python, FastAPI | APIs and model inference |
+| Database | MySQL | User, scan, and analysis records |
+| Mobile app | Flutter, Dart, Android Studio | Android user interface |
+| Version control | Git, GitHub | Collaboration and source management |
+| Distribution | Android App Bundle, Google Play Console | App release, subject to requirements and review |
 
-All endpoints must validate input, enforce access permissions, and return appropriate errors. Actual endpoint names may change during implementation.
+## Dataset and Current Progress
 
-## Repository Structure
+The project uses baseline T1-weighted MRI data from the Alzheimer’s Disease Neuroimaging Initiative (ADNI). Follow the dataset provider’s access conditions and data-use agreement.
 
-The repository may evolve as development progresses. A target structure is shown below:
+### Confirmed initial results
+
+| Item | Current result |
+|---|---|
+| DICOM files identified | 830 |
+| MRI volumes converted in the test subset | 5 |
+| Successful conversions in that subset | 5 |
+| Conversion failures in that subset | 0 |
+| Typical converted volume dimensions | 256 × 256 × 166 |
+| Approximate voxel spacing | 1.016 × 1.016 × 1.2 mm |
+| Initial QC volumes checked | 5 |
+| QC warnings/rejections in the reported test run | 0 |
+
+These results describe only the five-volume test subset. The current QC-accepted files should not be described as fully normalized or completely preprocessed; additional preprocessing and validation remain to be done.
+
+### Existing reports and visualizations
+
+- `results/dicom_conversion_report.csv`
+- `results/preprocessing_qc_report_*.csv`
+- `results/plots/` — MRI slice quality-control plots
+
+Large raw datasets, private data, virtual environments, generated caches, and model weights should not be committed to Git unless the project has an approved storage and sharing plan.
+
+## Project Structure
+
+The repository may evolve as implementation proceeds. A suggested structure is:
 
 ```text
 Alzheimer-Hippocampus-Segmentation/
-├── README.md
-├── docs/
-│   └── system-architecture.png
 ├── preprocessing/
 │   ├── dicom_to_nifti.py
 │   └── image_preprocessing.py
-├── dataset/
-│   ├── raw/                 # Keep private; do not commit
-│   ├── nifti/               # Keep private; do not commit
-│   └── masks/               # Keep private unless permitted
-├── models/
-│   ├── unet.py
-│   └── checkpoints/         # Large model files; do not commit by default
 ├── backend/
-├── frontend/
+│   ├── app/
+│   ├── api/
+│   ├── database/
+│   └── main.py
+├── android_app/
+│   ├── lib/
+│   ├── android/
+│   └── pubspec.yaml
+├── models/
 ├── results/
-│   ├── plots/
-│   └── reports/
-├── tests/
-├── requirements.txt
-└── .gitignore
+│   └── plots/
+├── documentation/
+├── .gitignore
+└── README.md
 ```
 
-This is a target layout, not a claim that every directory or module currently exists.
+Keep original MRI data outside the repository or in an approved private data store. The exact folders may differ from this suggested layout.
+
+## Team Responsibilities
+
+The work is divided into four approximately equal responsibility areas. The percentages refer to planned workload, not a claim that every member has completed that share.
+
+| Member | Responsibility | Main tasks | Deliverables |
+|---|---|---|---|
+| Member 1 | Dataset collection and MRI preprocessing | Collect and organize ADNI data; convert DICOM to NIfTI; validate dimensions and metadata; perform normalization, resampling, and other suitable preprocessing; prepare and verify masks; create subject-level data splits; generate QC reports. | Organized dataset, conversion/preprocessing scripts, verified MRI-mask pairs, QC reports, split files. |
+| Member 2 | U-Net model development and training | Study and implement U-Net; build data loaders; select suitable losses; apply augmentation; train and validate the model; save checkpoints and training history; generate predictions; provide an inference function. | U-Net implementation, training pipeline, trained checkpoint, training graphs, predicted masks, inference interface. |
+| Member 3 | Evaluation, hippocampal analysis, and backend | Evaluate segmentation using appropriate metrics; analyze errors; calculate hippocampal volumes and asymmetry; build FastAPI endpoints; connect MySQL; integrate the trained model; implement authentication and access controls; test APIs. | Evaluation report, measurement module, backend APIs, database integration, API documentation. |
+| Member 4 | Android app, integration, and release preparation | Develop Flutter screens; implement login, upload, result display, history, and reports; connect APIs; create app icon; test on Android devices; build signed AAB; prepare store listing and testing materials. | Android app, app icon, integrated interface, tested release bundle, Play Store listing materials. |
+
+All members contribute to weekly meetings, project diaries, code reviews, integration testing, final documentation, review presentations, and the final demonstration.
+
+## Development Roadmap
+
+| Phase | Activities | Status |
+|---|---|---|
+| 1. Research and setup | Topic selection, literature survey, repository, environment, project planning | Initial work completed |
+| 2. Dataset acquisition and conversion | ADNI data organization, DICOM-to-NIfTI conversion, initial validation | Completed for five test volumes |
+| 3. Full MRI preprocessing | Normalization, resampling, additional suitable processing, QC | Pending |
+| 4. Mask preparation | Obtain masks, verify alignment and labels, pair with MRI, subject-level splits | Pending |
+| 5. U-Net development | Implement, train, validate, save model, generate predictions | Pending |
+| 6. Evaluation and analysis | Dice, IoU, precision, recall, error analysis, volume measurements | Pending |
+| 7. Backend | FastAPI, MySQL, authentication, upload and inference endpoints | Pending |
+| 8. Android application | Flutter UI, API integration, visualization, history, reports | Pending |
+| 9. Testing and release | Integration/device tests, privacy documentation, signed AAB, closed testing, Play Store review | Pending |
 
 ## Setup
 
 ### Prerequisites
 
-- Python 3.10 or a compatible version supported by the installed dependencies.
-- Git.
-- VS Code (recommended).
-- Access to the required ADNI data.
-- Sufficient disk space for MRI volumes and model experiments.
+- Windows 10/11 or a compatible development environment.
+- Python version compatible with the selected PyTorch and image-processing packages.
+- VS Code, Git, Android Studio, and Flutter SDK for mobile development.
+- Access to ADNI data under its applicable terms.
+- MySQL for the planned backend.
 
-### Clone the Repository
+### Clone the repository
 
 ```powershell
 git clone https://github.com/minnachirakkal775-bot/Alzheimer-Hippocampus-Segmentation.git
 cd Alzheimer-Hippocampus-Segmentation
 ```
 
-### Create and Activate a Virtual Environment (Windows PowerShell)
+### Create and activate a Python virtual environment
 
 ```powershell
-python -m venv .venv
+py -m venv .venv
 .\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
 ```
 
-If PowerShell blocks activation, follow your organization's security policy or use the VS Code interpreter selector to choose the virtual environment.
-
-### Install Dependencies
-
-If a `requirements.txt` file is present and up to date:
+Install dependencies from the maintained requirements file when available:
 
 ```powershell
-python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-Install only the dependencies required by the current pipeline. PyTorch installation commands can vary by CPU/GPU and CUDA configuration; use the official PyTorch installation selector for the target machine.
+If a requirements file has not yet been created, install and pin the dependencies used by implemented scripts before sharing the environment. Check package compatibility rather than assuming arbitrary versions will work together.
 
-### Run DICOM-to-NIfTI Conversion
+### Run the existing conversion script
 
-After configuring the input and output paths in the conversion script:
+After placing authorized DICOM data in the configured input location and checking the script’s path settings:
 
 ```powershell
 python preprocessing/dicom_to_nifti.py
 ```
 
-### Run MRI Preprocessing and Quality Control
-
-After configuring the input directory and output/report locations:
+### Run the existing quality-checking script
 
 ```powershell
 python preprocessing/image_preprocessing.py
 ```
 
-Check the generated reports and plots before using any volumes for model development. Script arguments and paths may differ by local configuration.
+Review the generated CSV reports and plots. These scripts currently support the initial conversion/QC workflow; they do not imply that all planned preprocessing steps have been implemented.
 
-## Dataset and Data Handling
+### Mobile app setup
 
-- Keep raw ADNI data out of public Git repositories.
-- Follow ADNI data-use and citation requirements.
-- Do not upload identifiable or restricted medical data to public services.
-- Keep subject identifiers and metadata access controlled.
-- Preserve MRI-to-mask pairing and spatial metadata.
-- Use subject-level splits for model evaluation.
-- Document preprocessing parameters and dataset versions for reproducibility.
-
-## Current Project Status
-
-### Verified Progress
-
-- ADNI baseline MRI data has been downloaded and organized locally.
-- A conversion pipeline has been run on a five-volume subset.
-- Five MRI volumes were converted and validated successfully.
-- The converted volumes have dimensions of 256 × 256 × 166, with reported spacing approximately 1.016 × 1.016 × 1.2 mm.
-- The five-volume subset includes subjects `005_S_0324`, `005_S_0448`, `005_S_0553`, `005_S_0572`, and `005_S_0602`.
-- The conversion report is available at `results/dicom_conversion_report.csv`.
-- Initial preprocessing quality-control checks passed for all five volumes, with no warnings or rejections in the reported runs.
-- Quality-control reports and slice plots have been generated under `results/`.
-
-### Important Qualification
-
-The five volumes are a small pipeline-debugging subset, not a sufficient basis for claiming model generalization. The current quality-control stage should not be described as complete normalization, resampling, or full MRI preprocessing unless those operations have actually been applied and verified. No completed U-Net training, validated segmentation evaluation, disease classification, full-stack integration, or deployment is claimed here.
-
-### Next Steps
-
-1. Obtain and verify hippocampus ground-truth masks.
-2. Confirm MRI-mask alignment and labels.
-3. Implement and document the full preprocessing pipeline.
-4. Create subject-level train, validation, and test splits.
-5. Implement a baseline U-Net and data loader.
-6. Train the model and save checkpoints and training history.
-7. Evaluate on held-out subjects and review predictions.
-8. Calculate hippocampal measurements from validated masks.
-9. Explore optional classification only if appropriate labels and sample sizes are available.
-10. Develop and test the React frontend and FastAPI backend.
-11. Integrate authentication, role-based permissions, and MySQL storage.
-12. Perform testing, documentation, and deployment preparation.
-
-## Project Completion Status
-
-**Estimated overall project completion: 11%**
-
-This is a provisional planning estimate based on the work verified so far and an approximately equal workload split across four members. It is not a measured model-performance score. Percentages should be updated as deliverables are completed and reviewed.
-
-### Completion by Team Member
-
-| Team Member | Assigned Work | Verified Progress | Estimated Completion |
-|---|---|---|---:|
-| Member 1 | Dataset collection and MRI preprocessing | ADNI data organized; DICOM-to-NIfTI conversion and initial QC completed for five volumes. Full preprocessing and expanded dataset validation remain. | 35% |
-| Member 2 | Ground-truth mask preparation and U-Net development | No completed mask-pairing or model-training deliverable has been verified yet. | 0% |
-| Member 3 | Segmentation evaluation and hippocampal analysis | Evaluation metrics, volume analysis, and classification experiments are pending the validated masks and model predictions. | 0% |
-| Member 4 | Frontend, backend, database, and integration | Project documentation and initial repository structure are available; functional frontend, backend, database, and integration remain pending. | 10% |
-
-### Overall Calculation
-
-With four members assigned approximately equal workloads, the current planning estimate is the average of the member completion estimates:
-
-**(35% + 0% + 0% + 10%) / 4 = 11.25%, rounded to 11%.**
-
-The estimate will change as work is completed. A completed README or architecture diagram is a documentation deliverable and does not mean that the full application or model pipeline is implemented.
-
-## Team Work Distribution
-
-The project is planned for four members with approximately equal overall responsibility. Assignments below describe the planned division, not necessarily completed work.
-
-| Member | Responsibility | Main Deliverables |
-|---|---|---|
-| Member 1 | Dataset collection and MRI preprocessing | Organized dataset, conversion pipeline, preprocessing, QC reports, and documentation |
-| Member 2 | Mask preparation and deep learning | Verified MRI-mask pairs, data splits, U-Net, training pipeline, checkpoints, and predictions |
-| Member 3 | Evaluation and hippocampal analysis | Metrics, error analysis, volume measurements, comparisons, plots, and optional classification experiments |
-| Member 4 | Frontend, backend, and integration | React interface, FastAPI services, database integration, access control, tests, and deployment preparation |
-
-All members will contribute to code reviews, integration testing, weekly progress updates, final documentation, and presentation preparation.
-
-## Version Control
-
-Use `.gitignore` to exclude virtual environments, raw datasets, generated caches, private configuration, and large artifacts unless there is an explicit reason and permission to version them.
-
-Example commands for committing the README and architecture image:
+After the Flutter project has been created:
 
 ```powershell
-git add README.md docs/system-architecture.png
-git commit -m "Update README with system architecture"
-git push origin main
+flutter doctor
+flutter pub get
+flutter run
 ```
 
-Review `git status` before committing to ensure that raw MRI data, `.venv`, credentials, and unintended large files are not staged.
+Configure the API base URL to point to a backend reachable from the emulator or physical device. `localhost` on a phone does not automatically refer to the development computer.
+
+## Planned Application Workflow
+
+1. A user signs in to the Android application.
+2. The user selects an MRI file in a supported format.
+3. The app sends the file securely to the backend.
+4. The backend validates the file and runs the configured preprocessing and model inference pipeline.
+5. The model generates a hippocampus segmentation.
+6. Measurements are calculated only after the mask and image geometry have been validated.
+7. The backend stores authorized scan and analysis records.
+8. The app displays the image, segmentation overlay, measurements, and report.
+9. Users can view their own scan history. Administrative access must be role-controlled and logged.
+
+## Evaluation Plan
+
+The segmentation model will be evaluated against verified ground-truth masks using held-out subjects. Planned metrics include:
+
+- **Dice similarity coefficient:** overlap between predicted and reference masks.
+- **Intersection over Union (IoU):** intersection divided by union of predicted and reference regions.
+- **Precision:** proportion of predicted positive voxels that are correct.
+- **Recall:** proportion of reference positive voxels recovered by the model.
+
+Report the evaluation split, sample count, metric definitions, and limitations. Do not report performance values until the corresponding experiments have been run and checked.
+
+## Privacy and Security
+
+MRI data can be sensitive. Before making the app available to other users:
+
+- Follow ADNI data-use terms and do not redistribute restricted data.
+- Collect only information required by the application.
+- Use secure transport for uploads and API requests.
+- Enforce authentication, role-based permissions, and record ownership on the backend.
+- Do not rely only on hiding controls in the mobile interface for access control.
+- Restrict and log administrative access to sensitive records.
+- Define secure storage, retention, deletion, backup, and incident-handling procedures.
+- Publish an accurate privacy policy and complete applicable Google Play Data safety declarations.
+- Use synthetic or otherwise authorized test data during development and demonstrations.
 
 ## Limitations
 
-- The currently verified MRI subset is small and is intended for pipeline validation.
-- Supervised U-Net training requires correctly paired ground-truth masks.
-- Segmentation quality depends on data quality, annotation consistency, and independent evaluation.
-- Classification performance cannot be established without suitable labels and a defensible validation design.
-- The web application and database design are planned components until implementation and testing are complete.
-- This research prototype is not approved for clinical diagnosis or treatment decisions.
+- Initial conversion and QC results cover only five MRI volumes.
+- Verified hippocampus masks have not yet been confirmed for the current test subset.
+- U-Net training and held-out evaluation have not been completed.
+- Segmentation performance and clinical validity are therefore unknown.
+- Alzheimer’s stage classification would require suitable labels, adequate data, and separate validation; it is not established by hippocampus segmentation alone.
+- The Android app, backend, and Play Store release are planned work, not completed deliverables.
 
 ## Future Enhancements
 
-- Expand the dataset and verify mask availability and quality.
-- Compare 2D and 3D segmentation approaches where feasible.
-- Evaluate attention-based segmentation architectures.
-- Improve preprocessing reproducibility and automated quality checks.
-- Add interactive 3D visualization and longitudinal analysis when repeat scans are available.
-- Add robust experiment tracking and model versioning.
-- Complete secure web integration and deployment.
-- Conduct broader external validation before considering any clinical use.
+- Complete and validate the full preprocessing pipeline.
+- Train and compare baseline U-Net with suitable variants such as Attention U-Net, if resources and data permit.
+- Add robust 2D/3D visualization and longitudinal analysis where repeat scans are available.
+- Explore classification only with appropriate labels and rigorous validation.
+- Add explainability features with clear limitations.
+- Improve accessibility, usability, and multilingual support.
+- Conduct broader testing and prepare a secure production deployment.
 
 ## Acknowledgment
 
-The project uses MRI data from the Alzheimer’s Disease Neuroimaging Initiative (ADNI). Any use or publication of ADNI-derived data must follow the initiative’s applicable data-use and acknowledgment requirements.
+The project uses MRI data from the Alzheimer’s Disease Neuroimaging Initiative (ADNI), subject to its access requirements and data-use conditions. The team acknowledges the researchers, institutions, participants, and supporting organizations involved in making the dataset available.
 
 ## Disclaimer
 
-This software is developed for educational and research purposes. It is not a medical device and must not be used to diagnose, treat, or make clinical decisions about Alzheimer’s disease.
+This application is an academic research prototype. It is not intended to diagnose, treat, cure, or prevent Alzheimer’s disease or any other medical condition. Outputs must not replace assessment by qualified healthcare professionals. No claim of clinical accuracy or reliability should be made without appropriate independent validation and regulatory review.
