@@ -1,0 +1,28 @@
+@"
+# Python virtual environment
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Large MRI datasets
+dataset/
+*.nii
+*.nii.gz
+*.dcm
+
+# Generated results
+results/
+
+# Model checkpoints
+*.pth
+*.pt
+*.h5
+*.keras
+
+# IDE files
+.vscode/
+"@ | Set-Content .gitignore
