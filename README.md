@@ -279,12 +279,14 @@ The percentages below are **provisional progress estimates** based on the work c
 
 ### Project Completion Graph
 
-```text
-Member 1 — Dataset and preprocessing       35% | ███████░░░░░░░░░░░░░
-Member 2 — U-Net model development           0% | ░░░░░░░░░░░░░░░░░░░░
-Member 3 — Evaluation and backend            0% | ░░░░░░░░░░░░░░░░░░░░
-Member 4 — Android app and integration      10% | ██░░░░░░░░░░░░░░░░░░
-Overall project completion               11.25% | ██▎░░░░░░░░░░░░░░░░░
+The following **Mermaid chart is embedded directly in this README code file**; no separate image is required. GitHub renders the chart when it displays the Markdown file.
+
+```mermaid
+xychart-beta
+    title "Member-wise and Overall Project Completion"
+    x-axis [Member 1, Member 2, Member 3, Member 4, Overall]
+    y-axis "Completion (%)" 0 --> 100
+    bar [35, 0, 0, 10, 11.25]
 ```
 
 *Each bar represents progress out of 100%. The overall figure is the average of the four members’ estimates.*
