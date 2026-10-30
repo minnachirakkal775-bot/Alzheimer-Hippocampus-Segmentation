@@ -16,7 +16,7 @@ from monai.inferers import sliding_window_inference
 split_file = r"dataset\final\metadata\train_val_test_split.csv"
 image_dir = r"dataset\final\normalized_images"
 label_dir = r"dataset\final\labels"
-checkpoint_path = r"results\training\unet_epoch_2.pth"
+checkpoint_path = r"results\training\unet_epoch_10.pth"
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

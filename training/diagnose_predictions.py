@@ -16,7 +16,7 @@ from monai.inferers import sliding_window_inference
 split_file = r"dataset\final\metadata\train_val_test_split.csv"
 image_dir = r"dataset\final\normalized_images"
 label_dir = r"dataset\final\labels"
-checkpoint_path = r"results\training\unet_epoch_2.pth"
+checkpoint_path = r"results\training\unet_epoch_10.pth"
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -104,7 +104,7 @@ with torch.no_grad():
         )
 
         pred_np = prediction.cpu().numpy()[0]
-        label_np = label.cpu().numpy()[0, 0]
+        label_np = label.cpu().numpy()[0]
 
         predicted_voxels = int(np.sum(pred_np == 1))
         label_voxels = int(np.sum(label_np > 0))
